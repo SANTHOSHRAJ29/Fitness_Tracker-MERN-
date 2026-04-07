@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { loginUser } from "../utils/API";
 import Auth from "../utils/auth";
 import Header from "../components/Header";
 
 export default function Login() {
+  // Customizable dummy credentials
+  const DUMMY_CREDENTIALS = {
+    username: "admin",
+    password: "test123"
+  };
+
   const [formState, setFormState] = useState({ email: "", password: "" });
   const [showAlert, setShowAlert] = useState(false);
 
@@ -20,25 +25,22 @@ export default function Login() {
     });
   };
 
-  // submit form
+  // submit form (dummy check)
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
-    // check the response
-    try {
-      const response = await loginUser(formState);
-
-      if (!response.ok) {
-        throw new Error("something went wrong");
-      }
-
-      // use authentication function
-      const { token, user } = await response.json();
-      Auth.login(token);
-      console.log(user);
-    } catch (err) {
-      console.error(err);
+    // Dummy credential check (no backend call)
+    if (
+      formState.email.trim().toLowerCase() === DUMMY_CREDENTIALS.username &&
+      formState.password === DUMMY_CREDENTIALS.password
+    ) {
+      // Simulate successful login with dummy token
+      Auth.login("dummy_jwt_token");
+      console.log("Dummy login successful");
+    } else {
+      console.error("Invalid credentials");
       setShowAlert(true);
+      return;
     }
 
     // clear form values
@@ -57,14 +59,14 @@ export default function Login() {
     <div className="signup d-flex flex-column align-items-center justify-content-center text-center">
       <Header />
       <form onSubmit={handleFormSubmit} className="signup-form d-flex flex-column">
-        {/* --------------------email-------------------- */}
-        <label htmlFor="email">Email</label>
+        {/* --------------------username-------------------- */}
+        <label htmlFor="email">Username</label>
         <input
           className="form-input"
           value={formState.email}
-          placeholder="youremail@gmail.com"
+          placeholder="admin"
           name="email"
-          type="email"
+          type="text"
           onChange={handleChange}
         />
 
@@ -73,7 +75,7 @@ export default function Login() {
         <input
           className="form-input"
           value={formState.password}
-          placeholder="********"
+          placeholder="test123"
           name="password"
           type="password"
           onChange={handleChange}
@@ -81,15 +83,24 @@ export default function Login() {
 
         {/* --------------------login btn-------------------- */}
         <div className="btn-div">
-          <button disabled={!(formState.email && formState.password)}
-            className="signup-btn mx-auto my-auto">Login</button>
+          <button 
+            disabled={!(formState.email && formState.password)}
+            className="signup-btn mx-auto my-auto"
+            type="submit"
+          >
+            Login
+          </button>
         </div>
         {/* --------------------signup link-------------------- */}
         <p className="link-btn">
           New to FitTrack?{' '}
-          <Link to="/signup" >Create one</Link>
+          <Link to="/signup">Create one</Link>
         </p>
-        {showAlert && <div className="err-message">Login failed</div>}
+        {showAlert && (
+          <div className="err-message">
+            Login failed. Use username: admin, password: test123
+          </div>
+        )}
       </form>
     </div>
   );

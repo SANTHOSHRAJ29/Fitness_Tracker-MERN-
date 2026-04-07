@@ -9,6 +9,11 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' http://localhost:*; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'");
+  next();
+});
+
 // Serve up static assets
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../client/build")));
